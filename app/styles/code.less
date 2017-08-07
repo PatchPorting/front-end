@@ -1,0 +1,81 @@
+/*  Copyright (c) 2017 IBM Corp.
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE. */
+
+.code-block {
+  pre {
+    white-space: pre-wrap;
+    background-color: #fff;
+    border: none;
+    font-size: .8em;
+    margin: 0;
+    border-radius: 0;
+    padding: 3px 5px;
+    width: 100%;
+
+    &:nth-of-type(even) {
+      background-color: #f2f6fb;
+    }
+
+    &.added-line {
+      background-color: #e8ffe8;
+    }
+
+    &.removed-line {
+      background-color: #ffe8e8;
+    }
+  }
+}
+
+.expandable-code-container {
+  max-height: 200px;
+  overflow: hidden;
+  cursor: pointer;
+  position: relative;
+  transition: max-height 0.3s ease-in-out;
+  -moz-transiton: max-height 0.3 ease-in-out;
+
+  .expandable-code-overlay {
+    background: linear-gradient(
+      rgba(255, 255, 255, 0.7),
+      transparent,
+      rgba(255, 255, 255, 0.7)
+    );
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    opacity: 1;
+    width: 100%;
+    transition: opacity 0.3s ease-in-out;
+    -moz-transiton: opacity 0.3 ease-in-out;
+
+    &:hover {
+      opacity: 0;
+    }
+  }
+
+  &.expanded {
+    .expandable-code-overlay {
+      opacity: 0;
+    }
+  }
+
+  .code-block {
+    transition: margin-top 0.3s ease-in-out;
+    -moz-transition: margin-top 0.3s ease-in-out;
+  }
+}

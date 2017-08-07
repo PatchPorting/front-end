@@ -1,0 +1,70 @@
+/*  Copyright (c) 2017 IBM Corp.
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE. */
+
+import React from "react";
+
+export const TextInput = ({ type="text", placeholder = "", onChange, value = "" }) => {
+  return (
+    <input
+      style={styles.input}
+      type={type}
+      placeholder={placeholder}
+      onChange={e => onChange(e.target.value)}
+      value={value}
+    />
+  );
+};
+
+export const PasswordInput = ({ placeholder = "", onChange, value = "" }) => {
+  return (
+    <TextInput
+      type="password"
+      placeholder={placeholder}
+      onChange={onChange}
+      value={value}
+    />
+  );
+};
+
+export const NumInput = ({ onChange, min, max, value }) => {
+  let style = Object.assign({}, styles.input, styles.number);
+  return (
+    <input
+      style={style}
+      type="number"
+      onChange={e => onChange(e.target.value)}
+      value={value}
+      min={min}
+      max={max}
+    />
+  );
+};
+
+const styles = {
+  input: {
+    color: "#888",
+    borderColor: "#c2e0ff",
+    width: "100%",
+    borderStyle: "solid",
+    borderRadius: "20px",
+    padding: "5px 10px"
+  },
+  number: {
+    width: "50px",
+    padding: "0 5px"
+  }
+};

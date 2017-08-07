@@ -1,0 +1,69 @@
+{
+  "//": [
+    "Copyright (c) 2017 IBM Corp.",
+    "Permission is hereby granted, free of charge, to any person obtaining a copy",
+    "of this software and associated documentation files (the \"Software\"), to deal",
+    "in the Software without restriction, including without limitation the rights",
+    "to use, copy, modify, merge, publish, distribute, sublicense, and/or sell",
+    "copies of the Software, and to permit persons to whom the Software is",
+    "furnished to do so, subject to the following conditions:",
+    "The above copyright notice and this permission notice shall be included in",
+    "all copies or substantial portions of the Software.",
+    "THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR",
+    "IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,",
+    "FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE",
+    "AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER",
+    "LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,",
+    "OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN",
+    "THE SOFTWARE."
+  ],
+  "name": "patch-port",
+  "version": "1.0.0",
+  "description": "Patch Porting Tool",
+  "main": "index.js",
+  "scripts": {
+    "start": "webpack -p; node index.js",
+    "dev": "webpack-dev-server --hot",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.ibm.com/ETX/patch-port"
+  },
+  "author": "ETX",
+  "license": "ISC",
+  "devDependencies": {
+    "babel-core": "^6.25.0",
+    "babel-loader": "^7.0.0",
+    "babel-preset-es2015": "^6.24.1",
+    "babel-preset-react": "^6.24.1",
+    "css-loader": "^0.28.4",
+    "file-loader": "^0.11.2",
+    "html-webpack-plugin": "^2.28.0",
+    "imports-loader": "^0.7.1",
+    "json-loader": "^0.5.4",
+    "less": "^2.7.2",
+    "less-loader": "^4.0.4",
+    "path": "^0.12.7",
+    "source-map": "^0.5.6",
+    "style-loader": "^0.18.2",
+    "url-loader": "^0.5.9",
+    "webpack": "^2.6.1",
+    "webpack-dev-server": "^2.4.5"
+  },
+  "dependencies": {
+    "axios": "^0.16.2",
+    "d3": "^4.10.0",
+    "express": "^4.15.3",
+    "qs": "^6.5.0",
+    "react": "^15.6.0",
+    "react-dimensions": "^1.3.0",
+    "react-dom": "^15.6.0",
+    "react-flip-move": "^2.9.14",
+    "react-redux": "^5.0.5",
+    "react-router-dom": "^4.1.1",
+    "react-select": "^1.0.0-rc.5",
+    "redux": "^3.7.1",
+    "redux-persist": "^4.8.2"
+  }
+}
