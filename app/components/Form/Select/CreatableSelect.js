@@ -27,12 +27,44 @@ const CreateNew = ({ label }) => {
   );
 };
 
-const styles = {
-  icon: {
-    fontSize: "1.3em",
-    color: "#4990e2"
+class Option extends React.Component {
+  handleMouseDown(event) {
+    event.preventDefault();
+    event.stopPropagation();
+    this.props.onMouseOver(null);
+    this.props.onSelect(this.props.option, event);
   }
-};
+  handleMouseEnter(event) {
+    let option = this.props.option.content ? this.props.option : null;
+    this.props.onFocus(this.props.option, event);
+    this.props.onMouseOver(option);
+  }
+  handleMouseLeave(event) {
+    this.props.onMouseOver(null);
+  }
+  handleMouseMove(event) {
+    if (this.props.isFocused) return;
+    this.props.onFocus(this.props.option, event);
+  }
+  render() {
+    const { option, children, className } = this.props;
+
+    return (
+      <div
+        className={className}
+        onMouseDown={this.handleMouseDown.bind(this)}
+        onMouseEnter={this.handleMouseEnter.bind(this)}
+        onMouseLeave={this.handleMouseLeave.bind(this)}
+      >
+        {option.value === "create-new"
+          ? <CreateNew label={option.label} />
+          : <span>
+              {option.label}
+            </span>}
+      </div>
+    );
+  }
+}
 
 class CreatableSelect extends Component {
   constructor() {
@@ -50,24 +82,8 @@ class CreatableSelect extends Component {
     }
   }
 
-  handleOnClick() {
-    console.log("clicked!");
-  }
-
-  renderOption(option) {
-    if (option.value === "create-new") {
-      return <CreateNew label={option.label} />;
-    } else {
-      return (
-        <span>
-          {option.label}
-        </span>
-      );
-    }
-  }
-
   render() {
-    const { options, value, isLoading } = this.props;
+    const { options, value, onMouseOverItem } = this.props;
 
     let optionsList = [];
 
@@ -86,13 +102,22 @@ class CreatableSelect extends Component {
       <Select
         className="custom-select"
         options={optionsList}
-        optionRenderer={this.renderOption}
+        optionComponent={props =>
+          <Option {...props} onMouseOver={onMouseOverItem} />}
         onChange={this.handleChange.bind(this)}
         value={value}
         clearable={false}
+        onClose={() => onMouseOverItem(null)}
       />
     );
   }
 }
+
+const styles = {
+  icon: {
+    fontSize: "1.3em",
+    color: "#4990e2"
+  }
+};
 
 export default CreatableSelect;

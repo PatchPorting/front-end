@@ -18,6 +18,7 @@ THE SOFTWARE. */
 import React from "react";
 import CreatableSelect from "../Form/Select/CreatableSelect";
 import HeuristicBuilder from "../Heuristic/HeuristicBuilder";
+import HeuristicViewer from "../Heuristic/HeuristicViewer";
 import { fetchSetups } from "../../utils/fetchData";
 import { getOptions } from "../../utils/filter";
 import { connect } from "react-redux";
@@ -32,7 +33,8 @@ class HunkConfiguration extends React.Component {
     super();
     this.state = {
       selected: null,
-      isCreatingNewConfig: false
+      isCreatingNewConfig: false,
+      heuristicInfoToShow: null
     };
   }
 
@@ -82,6 +84,12 @@ class HunkConfiguration extends React.Component {
     this.props.updateAllHunkConfigurations(this.state.selected);
   }
 
+  showHeuristicInfo(option) {
+    this.setState({
+      heuristicInfoToShow: option
+    });
+  }
+
   render() {
     return (
       <div className="hunk-configuration">
@@ -95,6 +103,7 @@ class HunkConfiguration extends React.Component {
           value={this.state.selected}
           handleSelectionChange={this.handleConfigurationSelection.bind(this)}
           handleCreation={this.handleCreateNewConfiguration.bind(this)}
+          onMouseOverItem={this.showHeuristicInfo.bind(this)}
         />
 
         {this.state.isCreatingNewConfig &&
@@ -103,6 +112,9 @@ class HunkConfiguration extends React.Component {
             onCancel={this.handleCancel.bind(this)}
             onSuccess={this.handleSuccess.bind(this)}
           />}
+
+        {this.state.heuristicInfoToShow &&
+          <HeuristicViewer option={this.state.heuristicInfoToShow} />}
       </div>
     );
   }
