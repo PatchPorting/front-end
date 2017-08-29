@@ -15,26 +15,12 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE. */
 
-// ==UserScript==
-// @name        patch-porting
-// @namespace   joseph.schwarz@ibm.com
-// @description Extends debian source package table
-// @include     https://security-tracker.debian.org/tracker/*
-// @include     https://security-tracker.debian.org/tracker/*/
-// @exclude     https://security-tracker.debian.org/tracker/*/*
-// @version     1
-// @grant       none
-// ==/UserScript==
-
 (function() {
-  console.log("Running patch port script...");
-
-  // Defined for API requests
-  var baseUrl = "https://patchport-http.mybluemix.net/api/v0";
-  var appUrl = "https://patch-port.mybluemix.net/#/";
+  console.log("Running patch port status script...");
+  var patchport = new Patchport();
 
   // Add custom styles to page
-  addCss();
+  addCustomCss();
 
   // Get CVE, return if not found
   var cve = document
@@ -148,8 +134,8 @@ THE SOFTWARE. */
   function getCveId(cve, callback) {
     // Get CVE id
     var cveFilter = {where:{name: cve }};
-    var getCveUrl = baseUrl + "/cves?filter=" + escapeFilter(cveFilter);
-    fetchData(getCveUrl, function(responseData) {
+    var getCveUrl = patchport.baseUrl + "/cves?filter=" + patchport.escapeFilter(cveFilter);
+    patchport.fetchData(getCveUrl, function(responseData) {
       if (!responseData.length || !responseData[0].id) {
         console.log("NO CVE ID FOUND FOR CVE: " + cve);
         return;
@@ -168,8 +154,8 @@ THE SOFTWARE. */
       dist: info.release.split(" ")[0],
       cveIds: { inq: [cveId] }
     }};
-    var url = baseUrl + "/builds?" + "filter=" + escapeFilter(filter);
-    fetchData(url, function(responseData) {
+    var url = patchport.baseUrl + "/builds?" + "filter=" + patchport.escapeFilter(filter);
+    patchport.fetchData(url, function(responseData) {
       if (!responseData.length) {
         console.log(
           "NO RESPONSE DATA: Package: " +
@@ -201,21 +187,10 @@ THE SOFTWARE. */
             }
           }
         }
+        console.log("Patch port script finished!");
         return;
       }
     });
-  }
-
-  // Make get request and send back response data
-  function fetchData(url, callback) {
-    var xmlHttp = new XMLHttpRequest();
-    xmlHttp.onreadystatechange = function() {
-      if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
-        callback(JSON.parse(xmlHttp.responseText));
-      }
-    };
-    xmlHttp.open("GET", url, true);
-    xmlHttp.send(null);
   }
 
   // Splits row with multiple releases into their own dedicated rows
@@ -243,30 +218,7 @@ THE SOFTWARE. */
   // Adds patch status to row
   function addPatchToRow(row, patch) {
     var patchCell = row.childNodes[row.childNodes.length - 1];
-    var icon = "";
-
-    switch (patch.status) {
-      case "in progress":
-        icon = '<i class="in-progress fa fa-rotate-left" />';
-        break;
-      case "waiting":
-        icon = '<i class="waiting fa fa-clock-o" />';
-        break;
-      case "no solution":
-        icon = '<i class="no-solution fa fa-times" />';
-        break;
-      case "single solution":
-        icon = '<i class="single-solution fa fa-check"/>';
-        break;
-      case "multiple solution":
-        icon =
-          '<span class="multiple-solution"><i class="fa fa-check"/><i class="fa fa-check"/></span>';
-        break;
-      case "error":
-        icon = '<i class="error fa fa-exclamation-circle" />';
-        break;
-    }
-
+    var icon = patchport.getIcon(patch.status);
     var patchStatus = createPatchStatusElement(icon, patch);
     patchCell.appendChild(patchStatus);
   }
@@ -275,7 +227,7 @@ THE SOFTWARE. */
   function createPatchStatusElement(icon, patch) {
     var patchStatus = document.createElement("div");
     patchStatus.className = "patch-status";
-    var redirectUrl = appUrl + "?build=" + patch.id;
+    var redirectUrl = patchport.appUrl + "?build=" + patch.id;
 
     var providerInfo = getProviderInfo(patch.hunks);
 
@@ -460,8 +412,8 @@ THE SOFTWARE. */
     if (!Object.keys(mapped).length) callback({});
     
     for (var key in mapped) {
-      var request = baseUrl + "/" + endpoint + "/" + key + "?filter=" + escapeFilter(fieldFilter);
-      fetchData(request, function(responseData) {
+      var request = patchport.baseUrl + "/" + endpoint + "/" + key + "?filter=" + escapeFilter(fieldFilter);
+      patchport.fetchData(request, function(responseData) {
         responses.push(responseData);
         requests++;
         if (requests == Object.keys(mapped).length) {
@@ -482,8 +434,8 @@ THE SOFTWARE. */
 
     for (var key in mapped) {
       let filter = escapeFilter({where:{ id: key }});
-      let request = baseUrl + "/" + endpoint + "?filter=" + filter;
-      fetchData(request, function(responseData) {
+      let request = patchport.baseUrl + "/" + endpoint + "?filter=" + filter;
+      patchport.fetchData(request, function(responseData) {
         responses.push(responseData.length ? responseData[0] : {});
         requests++;
         if (requests == Object.keys(mapped).length) {
@@ -514,7 +466,7 @@ THE SOFTWARE. */
   /* --------------- CSS Styling --------------- */
 
   // Adds a custom stylesheet to page
-  function addCss() {
+  function addCustomCss() {
     css =
       "table td.patch-status-cell .patch-status .icon a" +
       "{color: black;" +
@@ -522,15 +474,10 @@ THE SOFTWARE. */
 
     css += "body.no-scroll" + "{overflow: hidden;}";
 
-    css +=
-      "table td.patch-status-cell .patch-status .icon a .multiple-solution" +
-      "{letter-spacing: -6px;" +
-      "margin-right: 5px;}";
-
-    css +=
-      "table td.patch-status-cell .patch-status .icon" +
-      "{padding: 0 3px;" +
-      "font-size: .9em;}";
+    // css +=
+    //   "table td.patch-status-cell .patch-status .icon" +
+    //   "{padding: 0 3px;" +
+    //   "font-size: .9em;}";
 
     css +=
       "table td.patch-status-cell .patch-status" +
@@ -569,8 +516,6 @@ THE SOFTWARE. */
     css +=
       "table td.patch-status-cell .patch-status .patch-info-popover p.details" +
       "{padding-left: 10px;}";
-
-    css += ".hidden" + "{display: none;}";
 
     css +=
       ".iframe-container" +
@@ -617,16 +562,6 @@ THE SOFTWARE. */
       "background-color: #0009;" +
       "z-index: 5;}";
 
-    css += ".bold {font-weight: bold;}";
-
-    css += ".multiple-solution, .single-solution" + "{color: #06a206;}";
-
-    css += ".no-solution, .error" + "{color: #c20404;}";
-
-    css += ".error" + "{color: #f00;}";
-
-    css += ".in-progress, .waiting" + "{color: #0088cc;}";
-
     var style = document.createElement("style");
 
     if (style.styleSheet) {
@@ -635,10 +570,6 @@ THE SOFTWARE. */
       style.appendChild(document.createTextNode(css));
     }
 
-    let script = document.createElement("script");
-    script.setAttribute("src", "https://use.fontawesome.com/a3da278475.js");
-
     document.getElementsByTagName("head")[0].appendChild(style);
-    document.getElementsByTagName("head")[0].appendChild(script);
   }
 })();

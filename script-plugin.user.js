@@ -20,31 +20,70 @@ THE SOFTWARE. */
 // @namespace   joseph.schwarz@ibm.com
 // @description Extends debian source package table
 // @include     https://security-tracker.debian.org/tracker/*
-// @include     https://security-tracker.debian.org/tracker/*/
-// @exclude     https://security-tracker.debian.org/tracker/*/*
 // @version     1
 // @grant       none
 // ==/UserScript==
 
 (function() {
-  
-  fetchData("https://patch-port.mybluemix.net/greasemonkey", function(response) {
-    var body = document.getElementsByTagName('body')[0];
-    var scriptTag = document.createElement('script');
-    scriptTag.innerHTML = response;
-    body.appendChild(scriptTag);
-  });
-  
-  // Make get request and send back response data
-  function fetchData(url, callback) {
+  var scripts = {
+    status: "status",
+    release: "release-summary",
+    sourcePackage: "source-package"
+  };
+
+  var baseUrl = "https://patch-port.mybluemix.net";
+
+  var debianUrl = "https://security-tracker.debian.org";
+  var path = window.location.href.replace(debianUrl, "").trim();
+
+  var scriptToRun = null;
+  if (path.match(/^\/tracker\/source-package\/[\w-]+\/?$/)) {
+    scriptToRun = scripts.sourcePackage;
+  } else if (path.match(/\/tracker\/status\/release\/[\w-]+\/?$/)) {
+    scriptToRun = scripts.release;
+  } else if (path.match(/\/tracker\/[\w-]+\/?$/)) {
+    scriptToRun = scripts.status;
+  }
+
+  if (scriptToRun) {
+    fetchFile(baseUrl + "/greasemonkey/patchport-functions.js", function(data) {
+      var body = document.getElementsByTagName("body")[0];
+      var globalFunctions = document.createElement("script");
+      globalFunctions.innerHTML = data;
+      body.appendChild(globalFunctions);
+      var scriptTag = document.createElement("script");
+
+      switch (scriptToRun) {
+        case scripts.status:
+          scriptTag.src = baseUrl + "/greasemonkey/patchport-status.js";
+          body.appendChild(scriptTag);
+          break;
+        case scripts.release:
+          scriptTag.src =
+            baseUrl + "/greasemonkey/patchport-release-summary.js";
+          body.appendChild(scriptTag);
+          break;
+        case scripts.sourcePackage:
+          scriptTag.src =
+            baseUrl + "/greasemonkey/patchport-package-summary.js";
+          body.appendChild(scriptTag);
+          break;
+      }
+    });
+  }
+
+  function fetchFile(url, callback) {
     var xmlHttp = new XMLHttpRequest();
     xmlHttp.onreadystatechange = function() {
       if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
         callback(xmlHttp.responseText);
       }
+      if (xmlHttp.readyState == 4 && xmlHttp.status == 404) {
+        callback(null);
+      }
     };
+
     xmlHttp.open("GET", url, true);
     xmlHttp.send(null);
   }
-
 })();
